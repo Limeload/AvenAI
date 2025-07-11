@@ -84,7 +84,3 @@ cp .env.example .env
 # 4. Run the dev server
 npm run dev
 ```
-
-
-
-# AvenAI
