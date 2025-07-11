@@ -1,7 +1,7 @@
 from exa_py import Exa
 from dotenv import load_dotenv
 import os
-import json
+import json         
 
 load_dotenv()
 

@@ -1,11 +1,10 @@
 import os
 import json
-import time
 import openai
 from tqdm import tqdm
 from dotenv import load_dotenv
 
-# Load API key
+# Load API key from .env
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -15,21 +14,26 @@ BATCH_SIZE = 20
 INPUT_FILE = "data/aven_chunks.json"
 OUTPUT_FILE = "data/aven_chunks_with_embeddings.json"
 
-# Load input chunks
-with open(INPUT_FILE, "r", encoding="utf-8") as f:
-    chunks = json.load(f)
+# Load chunks from JSON
+try:
+    with open(INPUT_FILE, "r", encoding="utf-8") as f:
+        chunks = json.load(f)
+except FileNotFoundError:
+    print(f"❌ Input file not found: {INPUT_FILE}")
+    exit(1)
 
-# Split into batches
-def batch_chunks(chunks, batch_size):
-    for i in range(0, len(chunks), batch_size):
-        yield chunks[i:i + batch_size]
+# Utility: Batch generator
+def batch_chunks(data, size):
+    for i in range(0, len(data), size):
+        yield data[i:i + size]
 
 embedded_chunks = []
 
-for batch in tqdm(list(batch_chunks(chunks, BATCH_SIZE)), desc="Embedding batches"):
-    texts = [str(chunk["text"]) for chunk in batch if chunk.get("text")]
+# Process batches
+for batch in tqdm(list(batch_chunks(chunks, BATCH_SIZE)), desc="🔁 Embedding batches"):
+    texts = [chunk.get("text", "").strip() for chunk in batch if chunk.get("text", "").strip()]
     if not texts:
-        continue  # skip empty batch
+        continue  # Skip empty batches
 
     try:
         response = openai.embeddings.create(
@@ -37,21 +41,21 @@ for batch in tqdm(list(batch_chunks(chunks, BATCH_SIZE)), desc="Embedding batche
             input=texts
         )
 
-        # Assign embeddings to each chunk
         for i, result in enumerate(response.data):
-            batch[i]["embedding"] = result.embedding
-            embedded_chunks.append(batch[i])
+            chunk = batch[i]
+            chunk["embedding"] = result.embedding
+            embedded_chunks.append(chunk)
 
     except openai.OpenAIError as e:
-        print(f"❌ OpenAI error: {e}")
+        print(f"❌ OpenAI API error: {e}")
         continue
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"❌ General error: {e}")
         continue
 
-# Save embedded data
+# Save output
 os.makedirs("data", exist_ok=True)
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(embedded_chunks, f, indent=2)
+    json.dump(embedded_chunks, f, indent=2, ensure_ascii=False)
 
-print(f"\n✅ Embedded {len(embedded_chunks)} chunks. Output saved to {OUTPUT_FILE}")
+print(f"\n✅ Embedded {len(embedded_chunks)} chunks saved to: {OUTPUT_FILE}")
