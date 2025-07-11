@@ -21,10 +21,8 @@ def chunk_text(text, max_tokens=500, overlap_tokens=50):
     for line in lines:
         tokens = len(tokenizer.encode(line))
         if current_tokens + tokens > max_tokens:
-            # Save current chunk
             chunks.append(" ".join(current_chunk))
-            # Start new chunk with overlap (last few lines)
-            current_chunk = current_chunk[-2:]  # overlap 2 lines
+            current_chunk = current_chunk[-2:]  # overlap
             current_tokens = sum(len(tokenizer.encode(l)) for l in current_chunk)
 
         current_chunk.append(line)
@@ -35,27 +33,39 @@ def chunk_text(text, max_tokens=500, overlap_tokens=50):
 
     return chunks
 
-# Load your filtered, useful Aven support data
+# Load your filtered Aven support data
 with open(INPUT_FILE, "r", encoding="utf-8") as f:
     data = json.load(f)
 
 chunked_data = []
 
 for doc in data:
+    if not doc.get("text"):
+        continue
     chunks = chunk_text(doc["text"])
     for i, chunk in enumerate(chunks):
         chunked_data.append({
             "id": str(uuid.uuid4()),
-            "title": doc["title"],
-            "url": doc["url"],
+            "title": doc.get("title", "[No title]"),
+            "url": doc.get("url", "[No URL]"),
             "tag": doc.get("tag", "useful"),
             "chunk_index": i,
             "text": chunk
         })
 
+# 🧹 Deduplicate by text
+unique_texts = set()
+deduped_chunks = []
+for item in chunked_data:
+    if item["text"] not in unique_texts:
+        unique_texts.add(item["text"])
+        deduped_chunks.append(item)
+
+print(f"🔁 Removed {len(chunked_data) - len(deduped_chunks)} duplicate chunks")
+
 # Save output
 os.makedirs("data", exist_ok=True)
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(chunked_data, f, indent=2)
+    json.dump(deduped_chunks, f, indent=2)
 
-print(f"✅ Chunked {len(data)} documents into {len(chunked_data)} chunks. Saved to {OUTPUT_FILE}")
+print(f"✅ Chunked {len(data)} documents into {len(deduped_chunks)} unique chunks. Saved to {OUTPUT_FILE}")
