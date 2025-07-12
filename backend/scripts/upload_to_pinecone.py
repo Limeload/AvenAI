@@ -37,9 +37,12 @@ def prepare_vector(item, idx):
     return (
         f"aven-chunk-{idx}",      # id
         item["embedding"],        # values
-        {"text": item["text"]}    # metadata
+        {
+            "text": item["text"],
+            "url": item.get("url", ""),
+            "title": item.get("title", "")
+        }    # metadata
     )
-
 # Upsert in batches
 batch_size = 100
 for i in range(0, len(data), batch_size):

@@ -10,6 +10,8 @@ export default function AskForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!question.trim()) return;
+
     setLoading(true);
     setResults([]);
     setError("");
@@ -20,74 +22,78 @@ export default function AskForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question: question.trim() }),
       });
 
       const data = await res.json();
-
       if (res.ok) {
         setResults(data.matches || []);
       } else {
         setError(data.error || "Something went wrong.");
       }
-    } catch (err: any) {
-      setError("Could not reach backend.");
+    } catch (err) {
+      setError("Could not reach backend. Please check if the server is running.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-4 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Ask Aven Support</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-2xl mx-auto mt-10 px-4">
+      <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+        Ask Aven Support
+      </h1>
+
+      <form onSubmit={handleSubmit} className="flex items-center space-x-2 mb-6">
         <input
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          className="w-full border px-3 py-2 rounded"
-          placeholder="Ask your question..."
-          required
+          placeholder="Ask a question..."
+          className="flex-1 px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+          disabled={loading}
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          disabled={loading}
+          disabled={loading || !question.trim()}
+          className="bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
         >
-          {loading ? "Searching..." : "Search"}
+          {loading ? "Searching..." : "Ask"}
         </button>
       </form>
 
-      {error && <p className="mt-4 text-red-500">{error}</p>}
-
-      {results.length > 0 && (
-        <div className="mt-6 space-y-4">
-          {results.map((match, idx) => (
-            <div key={idx} className="p-4 border rounded">
-              <p className="text-sm text-gray-600">
-                <strong>Score:</strong> {match.score?.toFixed(4)}
-              </p>
-              <p>
-                <strong>Title:</strong>{" "}
-                {match.metadata?.title || "[No title]"}
-              </p>
-              <p>
-                <strong>URL:</strong>{" "}
-                <a
-                  href={match.metadata?.url}
-                  target="_blank"
-                  className="text-blue-500 underline"
-                >
-                  {match.metadata?.url || "[No URL]"}
-                </a>
-              </p>
-              <p className="text-gray-700 mt-2">
-                {match.metadata?.text?.slice(0, 300)}...
-              </p>
-            </div>
-          ))}
+      {error && (
+        <div className="p-3 bg-red-100 text-red-700 rounded-md mb-4">
+          {error}
         </div>
       )}
+
+      {!loading && results.length === 0 && question && !error && (
+        <div className="text-gray-600 text-sm text-center">No results found.</div>
+      )}
+
+      <div className="space-y-4">
+        {results.map((item, index) => (
+          <div
+            key={index}
+            className="border border-gray-200 rounded-md p-4 hover:shadow-sm transition"
+          >
+            <h3 className="text-md font-medium text-gray-900 mb-2">
+              {item.title || "Untitled"}
+            </h3>
+            {item.url && (
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 text-sm hover:underline"
+              >
+                Follow the link to see more details →
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
