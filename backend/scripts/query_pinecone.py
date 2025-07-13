@@ -33,7 +33,7 @@ def check_index():
     print(f"  - Total vectors: {stats.get('total_vector_count')}")
     print(f"  - Namespaces: {list(stats.get('namespaces', {}).keys())}\n")
 
-def query_pinecone(query, top_k=5):
+def query_pinecone(query, top_k=1):
     vector = embed_query(query)
     response = index.query(vector=vector, top_k=top_k, include_metadata=True)
     matches = getattr(response, "matches", [])
