@@ -3,6 +3,8 @@
 import { useState } from "react";
 import MessageBubble from "./MessageBubble";
 import Loader from "./Loader";
+import VoiceChat from "./VoiceChat";
+
 
 type Message = {
   sender: "user" | "bot";
@@ -14,6 +16,7 @@ export default function ChatBox() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+
  
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -47,6 +50,10 @@ export default function ChatBox() {
     if (e.key === "Enter") sendMessage();
   };
 
+  const handleVoiceMessage = (msg: Message) => {
+    setMessages((prev) => [...prev, msg]);
+  };
+
   return (
     <div className="max-w-xl mx-auto mt-10 px-4">
       <div className="border rounded-md p-4 h-[400px] overflow-y-auto mb-4 bg-white">
@@ -72,6 +79,7 @@ export default function ChatBox() {
         >
           Send
         </button>
+        <VoiceChat onMessage={handleVoiceMessage} />
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+"use client";
+
 type MessageBubbleProps = {
   sender: "user" | "bot";
   message: string;
