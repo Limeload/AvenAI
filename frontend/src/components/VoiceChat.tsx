@@ -2,15 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Vapi from "@vapi-ai/web";
-<<<<<<< HEAD
-=======
 import Image from "next/image";
->>>>>>> edb7d2b (Initial empty commit)
-
-type Message = {
-  sender: "user" | "bot";
-  text: string;
-};
+import { Message } from "./Message";
 
 interface VoiceChatProps {
   onMessage: (message: Message) => void;
@@ -65,28 +58,12 @@ export default function VoiceChat({ onMessage }: VoiceChatProps) {
       setIsListening(false);
     } else {
       console.log("🎤 Starting conversation with assistant:", assistantId);
-<<<<<<< HEAD
-      vapi.start(assistantId); // ✅ Correct for current SDK
-=======
       vapi.start(assistantId); 
->>>>>>> edb7d2b (Initial empty commit)
       setIsListening(true);
     }
   };
 
   return (
-<<<<<<< HEAD
-    <div className="fixed bottom-8 right-8 z-50">
-      <button
-        onClick={toggleRecording}
-        className={`w-16 h-16 rounded-full shadow-lg transition ${
-          isListening ? "bg-red-500" : "bg-blue-600"
-        } hover:scale-110`}
-        title={isListening ? "Stop voice input" : "Start voice input"}
-      >
-        🎤
-      </button>
-=======
     <div className="w-64 bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center justify-center ml-8">
       {/* Assistant Avatar */}
       <div className="w-full flex justify-center mb-4">
@@ -111,7 +88,6 @@ export default function VoiceChat({ onMessage }: VoiceChatProps) {
         🎤
       </button>
       <div className="mt-4 text-center text-black font-semibold text-lg">Voice Assistant</div>
->>>>>>> edb7d2b (Initial empty commit)
     </div>
   );
 }

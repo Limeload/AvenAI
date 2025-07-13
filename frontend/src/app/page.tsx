@@ -1,19 +1,9 @@
 "use client";
 
-<<<<<<< HEAD
-import ChatBox from "@/components/ChatBox";
-
-export default function AskPage() {
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-       <ChatBox />;
-=======
 import { useState } from "react";
 import ChatBox from "@/components/ChatBox";
 import VoiceChat from "@/components/VoiceChat";
-
-// Import the Message type from ChatBox
-import type { Message } from "@/components/ChatBox";
+import type { Message } from "@/components/Message";
 
 export default function AskPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,7 +23,6 @@ export default function AskPage() {
           <VoiceChat onMessage={handleVoiceMessage} />
         </div>
       </div>
->>>>>>> edb7d2b (Initial empty commit)
     </div>
   );
 }
