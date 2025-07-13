@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Vapi from "@vapi-ai/web";
+<<<<<<< HEAD
+=======
+import Image from "next/image";
+>>>>>>> edb7d2b (Initial empty commit)
 
 type Message = {
   sender: "user" | "bot";
@@ -61,12 +65,17 @@ export default function VoiceChat({ onMessage }: VoiceChatProps) {
       setIsListening(false);
     } else {
       console.log("🎤 Starting conversation with assistant:", assistantId);
+<<<<<<< HEAD
       vapi.start(assistantId); // ✅ Correct for current SDK
+=======
+      vapi.start(assistantId); 
+>>>>>>> edb7d2b (Initial empty commit)
       setIsListening(true);
     }
   };
 
   return (
+<<<<<<< HEAD
     <div className="fixed bottom-8 right-8 z-50">
       <button
         onClick={toggleRecording}
@@ -77,6 +86,32 @@ export default function VoiceChat({ onMessage }: VoiceChatProps) {
       >
         🎤
       </button>
+=======
+    <div className="w-64 bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center justify-center ml-8">
+      {/* Assistant Avatar */}
+      <div className="w-full flex justify-center mb-4">
+        <Image
+          src="/assistant-avatar.png"
+          alt="Assistant Avatar"
+          width={180}
+          height={180}
+          className="object-cover"
+          style={{ borderRadius: 0 }}
+        />
+      </div>
+      <button
+        onClick={toggleRecording}
+        className={`w-16 h-16 rounded-full shadow flex items-center justify-center text-3xl transition-all duration-200
+          border-2 border-black
+          ${isListening ? "bg-gray-300 text-black scale-110" : "bg-black text-white hover:bg-gray-800 hover:scale-105"}
+        `}
+        title={isListening ? "Stop voice input" : "Start voice input"}
+        style={{ outline: 'none' }}
+      >
+        🎤
+      </button>
+      <div className="mt-4 text-center text-black font-semibold text-lg">Voice Assistant</div>
+>>>>>>> edb7d2b (Initial empty commit)
     </div>
   );
 }
