@@ -7,13 +7,14 @@ import Loader from "./Loader";
 type Message = {
   sender: "user" | "bot";
   text: string;
+  sources?: { title: string; url: string }[];
 };
 
 export default function ChatBox() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-
+ 
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMsg = input.trim();
@@ -31,8 +32,10 @@ export default function ChatBox() {
 
       const data = await res.json();
       const answer = data.answer || data.error || "No response";
+      const sources = data.sources || [];
 
-      setMessages((prev) => [...prev, { sender: "bot", text: answer }]);
+
+      setMessages((prev) => [...prev, { sender: "bot", text: answer, sources }]);
     } catch (err) {
       setMessages((prev) => [...prev, { sender: "bot", text: "Error reaching server." }]);
     } finally {
@@ -48,7 +51,7 @@ export default function ChatBox() {
     <div className="max-w-xl mx-auto mt-10 px-4">
       <div className="border rounded-md p-4 h-[400px] overflow-y-auto mb-4 bg-white">
         {messages.map((msg, i) => (
-          <MessageBubble key={i} sender={msg.sender} message={msg.text} />
+          <MessageBubble key={i} sender={msg.sender} message={msg.text} sources={msg.sources} />
         ))}
         {loading && <Loader />}
       </div>
