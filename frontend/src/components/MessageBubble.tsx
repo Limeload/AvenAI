@@ -14,19 +14,22 @@ export default function MessageBubble({ sender, message, sources }: MessageBubbl
             : "bg-gray-200 text-gray-800"
         }`}
       >
-        {message}
+           <div className="whitespace-pre-wrap leading-relaxed text-gray-800">
+               {message}
+           </div>
+
         {sources && sources.length > 0 && (
           <div className="mt-2">
-            <p className="text-sm font-medium mb-1">Sources:</p>
+            <p className="text-sm font-bold mb-1">Follow the link to see more details →</p>
             {sources.map((source, index) => (
               <a
                 key={index}
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-sm text-blue-600 hover:underline"
+                className="block text-sm font-semibold text-blue-600 hover:underline"
               >
-                {source.title}
+                {source.url}
               </a>
             ))}
           </div>
