@@ -14,6 +14,12 @@ if not OPENAI_API_KEY or not PINECONE_API_KEY:
 # OpenAI setup
 openai.api_key = OPENAI_API_KEY
 
+SMALL_TALK = {"hi", "hello", "hey", "thanks", "thank you", "bye"}
+
+def is_small_talk(text: str) -> bool:
+    return text.strip().lower() in SMALL_TALK
+
+
 def embed_query(query):
     print("📡 Generating embedding...")
     response = openai.embeddings.create(

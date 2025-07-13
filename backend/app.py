@@ -7,7 +7,7 @@ import json
 # Add scripts directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'scripts'))
 
-from scripts.query_pinecone import query_pinecone, generate_answer_with_context
+from scripts.query_pinecone import query_pinecone, generate_answer_with_context, is_small_talk
 
 app = Flask(__name__)
 CORS(app)
@@ -21,6 +21,18 @@ def ask():
             return jsonify({"error": "Missing 'question'"}), 400
 
         print(f"\n🔍 Received question: {query}")
+
+        if is_small_talk(query):
+            # Direct response without RAG
+            answer = {
+                "hi": "Hi there!",
+                "hello": "Hello! How can I assist you today?",
+                "hey": "Hey! What can I help you with?",
+                "thanks": "You're welcome!",
+                "thank you": "Glad to help!",
+                "bye": "Goodbye! Have a great day!",
+            }.get(query.strip().lower(), "Hello!")
+            return jsonify({"answer": answer, "sources": []}), 200
 
         # Step 1: Query Pinecone for matches + context
         results = query_pinecone(query)
