@@ -7,6 +7,7 @@ export default function AskForm() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [answer, setAnswer] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +29,7 @@ export default function AskForm() {
       const data = await res.json();
       if (res.ok) {
         setResults(data.matches || []);
+        setAnswer(data.answer || "");
       } else {
         setError(data.error || "Something went wrong.");
       }
@@ -72,28 +74,14 @@ export default function AskForm() {
         <div className="text-gray-600 text-sm text-center">No results found.</div>
       )}
 
-      <div className="space-y-4">
-        {results.map((item, index) => (
-          <div
-            key={index}
-            className="border border-gray-200 rounded-md p-4 hover:shadow-sm transition"
-          >
-            <h3 className="text-md font-medium text-gray-900 mb-2">
-              {item.title || "Untitled"}
-            </h3>
-            {item.url && (
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 text-sm hover:underline"
-              >
-                Follow the link to see more details →
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+<div className="space-y-4">
+{results.length > 0 && (
+  <div className="mb-6 bg-gray-50 p-4 rounded-md border">
+    <h2 className="text-lg font-semibold mb-2">📘 Answer</h2>
+    <p className="text-gray-800">{answer}</p>
+  </div>
+)}
+</div>
     </div>
   );
 }
