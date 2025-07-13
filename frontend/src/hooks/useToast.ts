@@ -1,6 +1,14 @@
 import * as React from "react";
 
-import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
+// Basic toast types - replace with actual UI library types if needed
+type ToastActionElement = React.ReactElement;
+type ToastProps = {
+  id?: string;
+  title?: string;
+  description?: string;
+  action?: ToastActionElement;
+  open?: boolean;
+};
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -10,6 +18,8 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const actionTypes = {
