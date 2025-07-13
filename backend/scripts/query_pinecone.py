@@ -34,60 +34,46 @@ def check_index():
     print(f"  - Namespaces: {list(stats.get('namespaces', {}).keys())}\n")
 
 def query_pinecone(query, top_k=5):
+    vector = embed_query(query)
+    response = index.query(vector=vector, top_k=top_k, include_metadata=True)
+    matches = getattr(response, "matches", [])
+
+    context = "\n".join([match.metadata.get("text", "") for match in matches])
+    return {
+        "context": context,
+        "matches": [
+            {
+                "score": match.score,
+                "title": match.metadata.get("title", "Untitled"),
+                "url": match.metadata.get("url", ""),
+                "text": match.metadata.get("text", "")[:300] + "..."
+            }
+            for match in matches
+        ]
+    }
+
+def generate_answer_with_context(query, matches):
+    """
+    Generate a concise answer using the query and matched documents.
+    """
+    context_texts = [
+        match["metadata"].get("text", "") for match in matches if "metadata" in match
+    ]
+    context = "\n\n".join(context_texts[:3])  # Take top 3 matches max
+
+    messages = [
+        {"role": "system", "content": "You are a helpful support assistant for Aven."},
+        {"role": "user", "content": f"Answer the question based on the context below:\n\n{context}\n\nQuestion: {query}"}
+    ]
+
     try:
-        check_index()
-
-        vector = embed_query(query)
-        result = index.query(vector=vector, top_k=top_k, include_metadata=True)
-        metadata_list = getattr(result, "matches", [])
-
-        print(f"🔍 Found {len(metadata_list)} results\n")
-
-        if not metadata_list:
-            print("⚠️ No matches found. Try changing the query or check your index data.")
-            return []
-
-        # Debug: Show first result metadata
-        if metadata_list:
-            print("🔍 Debug - First result metadata:")
-            first_item = metadata_list[0]
-            print(f"  - Item type: {type(first_item)}")
-            print(f"  - Item content: {first_item}")
-            if hasattr(first_item, 'metadata'):
-                print(f"  - Metadata: {first_item.metadata}")
-            print()
-
-        seen_urls = set()
-        unique = []
-        for item in metadata_list:
-            meta = item.metadata or {}
-            url = meta.get("url", "").strip()
-
-            if url and url not in seen_urls:
-               seen_urls.add(url)
-               unique.append({
-                   "title": meta.get("title", "No Title"),
-                   "url": url,
-                   "description": meta.get("text", "No Description")
-                })
-
-        if not unique:
-            print("⚠️ No unique results to display (possibly all duplicates).")
-            return []
-
-        for i, chunk in enumerate(unique, 1):
-            print(f"Result #{i}")
-            print(f"Title      : {chunk['title']}")
-            print(f"URL        : {chunk['url']}")
-            print(f"Description: {chunk['description']}")
-            print("-" * 50)
-
-        return unique
-
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",  # You can switch to gpt-4 if needed
+            messages=messages,  # type: ignore
+            temperature=0.3
+        )
+        content = response.choices[0].message.content
+        return content.strip() if content else "No response generated."
     except Exception as e:
-        print(f"❌ Error querying Pinecone: {e}")
-        raise
-
-
-    
-   
+        print("❌ Error generating answer:", e)
+        return "Sorry, I couldn't generate an answer right now."
