@@ -73,8 +73,8 @@ export default function VoiceAssistant() {
         <Image
           src="/assistant-avatar.png"
           alt="Assistant Avatar"
-          width={120}
-          height={120}
+          width={180}
+          height={180}
           className="object-cover"
           style={{ borderRadius: 0 }}
         />
@@ -90,10 +90,9 @@ export default function VoiceAssistant() {
       >
         🎤
       </button>
-      <div className="mt-4 text-center text-black font-semibold text-lg">Voice Assistant</div>
       <div className="w-full flex-1 mt-6 overflow-y-auto max-h-64">
         {history.length === 0 && (
-          <div className="text-center text-gray-400">No conversation yet. Click the mic and ask a question!</div>
+          <div className="text-center text-gray-400"> Click the mic and ask a question!</div>
         )}
         {history.map((msg, i) => (
           <div key={i} className={`mb-2 flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
