@@ -26,10 +26,22 @@ export default function VoiceAssistant() {
 
     v.on("message", (data: any) => {
       console.log("📥 Vapi message:", data);
-      if (data.type === "transcript" && data.final) {
-        setHistory((prev) => [...prev, { sender: "user", text: data.transcript }]);
+      if (data.type === "transcript" && data.transcript) {
+        setHistory((prev) => {
+          const newMsg = { sender: data.role === "assistant" ? "bot" as const : "user" as const, text: data.transcript };
+          if (prev.length === 0 || prev[prev.length - 1].text !== newMsg.text || prev[prev.length - 1].sender !== newMsg.sender) {
+            return [...prev, newMsg];
+          }
+          return prev;
+        });
       } else if (data.type === "speech" && data.transcript) {
-        setHistory((prev) => [...prev, { sender: "bot", text: data.transcript }]);
+        setHistory((prev) => {
+          const newMsg = { sender: "bot" as const, text: data.transcript };
+          if (prev.length === 0 || prev[prev.length - 1].text !== newMsg.text || prev[prev.length - 1].sender !== newMsg.sender) {
+            return [...prev, newMsg];
+          }
+          return prev;
+        });
       }
     });
 
@@ -65,6 +77,7 @@ export default function VoiceAssistant() {
       setIsListening(true);
     }
   };
+
 
   return (
     <div className="w-full h-full bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center justify-center">
