@@ -14,5 +14,5 @@ export async function POST(req: NextRequest) {
   }
 
   const data = await backendRes.json();
-  return NextResponse.json({ answer: data.answer });
+  return NextResponse.json({ answer: data.answer, sources: data.sources || [] });
 } 
