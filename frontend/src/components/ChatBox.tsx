@@ -1,21 +1,13 @@
 "use client";
+import { useState, useRef, useEffect } from "react";
 
-import { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
-import MessageBubble from "./MessageBubble";
-import Loader from "./Loader";
-import Image from "next/image";
-import { Message } from "./Message";
-import SuggestedPrompts from "./SuggestedPrompts";
-
-type ChatBoxProps = {
-  messages: Message[];
-  setMessages: Dispatch<SetStateAction<Message[]>>;
-};
-
-export default function ChatBox({ messages, setMessages }: ChatBoxProps) {
+export default function ChatBox() {
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -23,60 +15,78 @@ export default function ChatBox({ messages, setMessages }: ChatBoxProps) {
     }
   }, [messages]);
 
+  // Setup speech recognition
+  useEffect(() => {
+    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "en-US";
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setListening(false);
+      };
+      recognitionRef.current.onerror = () => {
+        setListening(false);
+      };
+      recognitionRef.current.onend = () => {
+        setListening(false);
+      };
+    }
+  }, []);
+
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMsg = input.trim();
-    setMessages((prev) => [...prev, { sender: "user", text: userMsg, sources: [] }]);
+    setMessages((prev) => [...prev, { sender: "user", text: userMsg }]);
     setInput("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/ask", {
+      const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: userMsg }),
       });
       const data = await res.json();
-      const answer = data.answer || data.error || "No response";
-      const sources = data.sources || [];
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: answer, sources },
+        { sender: "bot", text: data.answer || data.error || "No response" },
       ]);
     } catch (err) {
-      setMessages((prev) => [...prev, { sender: "bot", text: "Error reaching server.", sources: [] }]);
+      setMessages((prev) => [...prev, { sender: "bot", text: "Error reaching server." }]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") sendMessage();
+  const handleMic = () => {
+    if (!recognitionRef.current) return;
+    if (listening) {
+      recognitionRef.current.stop();
+      setListening(false);
+    } else {
+      setListening(true);
+      recognitionRef.current.start();
+    }
   };
 
   return (
     <div className="w-full h-full bg-white rounded-2xl shadow-2xl flex flex-col justify-center">
-      {/* Aven Logo */}
-      <Image src="/aven-logo.png" alt="Aven" width={140} height={56} className="mb-6 mx-auto" />
-      {/* Chat card */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Chat area */}
         <div className="flex-1 overflow-y-auto px-2 mb-2 max-h-[500px]">
-          {messages.length === 0 && (
-            <div className="text-center text-gray-400 mt-10">
-              <div className="mb-6">No messages yet. Try typing or using the mic!</div>
-              <SuggestedPrompts input={input} setInput={setInput} showStarter={input.length === 0} />
-            </div>
-          )}
           {messages.map((msg, i) => (
-            <MessageBubble key={i} sender={msg.sender} message={msg.text} sources={msg.sources} />
+            <div key={i} className={`mb-2 ${msg.sender === "user" ? "text-right" : "text-left"}`}>
+              <span className={msg.sender === "user" ? "text-blue-600" : "text-green-600"}>
+                {msg.sender}: {msg.text}
+              </span>
+            </div>
           ))}
-          {loading && <Loader />}
+          {loading && <div>Loading...</div>}
           <div ref={chatEndRef} />
         </div>
-        {/* Input */}
         <div className="flex flex-col mt-auto p-4 border-t border-gray-200">
-          {/* Dynamic Suggestions */}
-          {messages.length > 0 && <SuggestedPrompts input={input} setInput={setInput} />}
           <div className="flex items-center space-x-2">
             <input
               type="text"
@@ -84,7 +94,7 @@ export default function ChatBox({ messages, setMessages }: ChatBoxProps) {
               placeholder="Type a question..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               disabled={loading}
             />
             <button
@@ -94,9 +104,17 @@ export default function ChatBox({ messages, setMessages }: ChatBoxProps) {
             >
               Send
             </button>
+            <button
+              onClick={handleMic}
+              disabled={loading}
+              className={`ml-2 rounded-full p-2 border ${listening ? "bg-green-200" : "bg-gray-200"}`}
+              title={listening ? "Stop listening" : "Start voice input"}
+            >
+              {listening ? "🎤..." : "🎤"}
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-}
+} 
