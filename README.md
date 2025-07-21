@@ -7,14 +7,6 @@ A voice- and chat-enabled AI support agent that can answer questions about [Aven
 
 ---
 
-## 🚀 Demo
-
-🎥 Watch the full demo: [YouTube Link Here](#)
-
-🌐 Live App: [Vercel Deployment Link Here](#)
-
----
-
 ## 🧠 What It Does
 
 This project allows users to:
