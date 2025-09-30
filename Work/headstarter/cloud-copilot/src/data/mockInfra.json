@@ -1,0 +1,299 @@
+{
+  "aws": {
+    "provider": "AWS",
+    "scan_timestamp": "2024-01-15T10:30:00Z",
+    "regions": ["us-east-1", "us-west-2"],
+    "resources": {
+      "ec2_instances": [
+        {
+          "id": "i-1234567890abcdef0",
+          "type": "t3.large",
+          "state": "running",
+          "launch_time": "2024-01-01T00:00:00Z",
+          "tags": {
+            "Name": "web-server-1",
+            "Environment": "production",
+            "Owner": "devops-team"
+          },
+          "region": "us-east-1",
+          "vpc_id": "vpc-12345678",
+          "subnet_id": "subnet-12345678",
+          "security_groups": ["sg-12345678"],
+          "public_ip": "54.123.45.67",
+          "private_ip": "10.0.1.100"
+        },
+        {
+          "id": "i-0987654321fedcba0",
+          "type": "t3.xlarge",
+          "state": "running",
+          "launch_time": "2024-01-05T00:00:00Z",
+          "tags": {
+            "Name": "database-server",
+            "Environment": "production",
+            "Owner": "devops-team"
+          },
+          "region": "us-east-1",
+          "vpc_id": "vpc-12345678",
+          "subnet_id": "subnet-87654321",
+          "security_groups": ["sg-87654321"],
+          "public_ip": null,
+          "private_ip": "10.0.2.100"
+        },
+        {
+          "id": "i-abcdef1234567890",
+          "type": "t3.micro",
+          "state": "stopped",
+          "launch_time": "2023-12-01T00:00:00Z",
+          "tags": {
+            "Name": "test-server",
+            "Environment": "development",
+            "Owner": "dev-team"
+          },
+          "region": "us-west-2",
+          "vpc_id": "vpc-abcdef12",
+          "subnet_id": "subnet-abcdef12",
+          "security_groups": ["sg-abcdef12"],
+          "public_ip": null,
+          "private_ip": "10.1.1.100"
+        }
+      ],
+      "rds_instances": [
+        {
+          "id": "mydb-instance-1",
+          "engine": "mysql",
+          "engine_version": "8.0.35",
+          "instance_class": "db.t3.medium",
+          "status": "available",
+          "allocated_storage": 100,
+          "storage_type": "gp2",
+          "multi_az": false,
+          "publicly_accessible": false,
+          "region": "us-east-1",
+          "vpc_id": "vpc-12345678",
+          "tags": {}
+        },
+        {
+          "id": "mydb-instance-2",
+          "engine": "postgres",
+          "engine_version": "15.4",
+          "instance_class": "db.t3.large",
+          "status": "available",
+          "allocated_storage": 500,
+          "storage_type": "gp3",
+          "multi_az": true,
+          "publicly_accessible": false,
+          "region": "us-east-1",
+          "vpc_id": "vpc-12345678",
+          "tags": {}
+        }
+      ],
+      "s3_buckets": [
+        {
+          "name": "my-app-backups",
+          "creation_date": "2024-01-01T00:00:00Z",
+          "region": "us-east-1",
+          "policy": null,
+          "public_read": false
+        },
+        {
+          "name": "my-public-assets",
+          "creation_date": "2024-01-02T00:00:00Z",
+          "region": "us-east-1",
+          "policy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::my-public-assets/*"
+              }
+            ]
+          },
+          "public_read": true
+        },
+        {
+          "name": "my-app-logs",
+          "creation_date": "2024-01-03T00:00:00Z",
+          "region": "us-west-2",
+          "policy": null,
+          "public_read": false
+        }
+      ],
+      "iam_users": [
+        {
+          "username": "admin-user",
+          "user_id": "AIDACKCEVSQ6C2EXAMPLE",
+          "arn": "arn:aws:iam::123456789012:user/admin-user",
+          "create_date": "2024-01-01T00:00:00Z",
+          "path": "/",
+          "has_login_profile": true,
+          "has_access_keys": true,
+          "attached_policies": ["AdministratorAccess"],
+          "inline_policies": []
+        },
+        {
+          "username": "dev-user",
+          "user_id": "AIDACKCEVSQ6C2EXAMPLE2",
+          "arn": "arn:aws:iam::123456789012:user/dev-user",
+          "create_date": "2024-01-02T00:00:00Z",
+          "path": "/",
+          "has_login_profile": false,
+          "has_access_keys": true,
+          "attached_policies": ["PowerUserAccess"],
+          "inline_policies": ["S3ReadOnlyPolicy"]
+        }
+      ],
+      "cloudwatch_metrics": {
+        "us-east-1": {
+          "ec2_metrics": ["CPUUtilization", "NetworkIn", "NetworkOut"],
+          "rds_metrics": ["CPUUtilization", "DatabaseConnections", "FreeableMemory"],
+          "region": "us-east-1"
+        },
+        "us-west-2": {
+          "ec2_metrics": ["CPUUtilization", "NetworkIn", "NetworkOut"],
+          "rds_metrics": [],
+          "region": "us-west-2"
+        }
+      }
+    },
+    "summary": {
+      "total_ec2_instances": 3,
+      "total_rds_instances": 2,
+      "total_s3_buckets": 3,
+      "total_iam_users": 2,
+      "regions_scanned": 2
+    }
+  },
+  "gcp": {
+    "provider": "GCP",
+    "scan_timestamp": "2024-01-15T10:30:00Z",
+    "project_id": "my-gcp-project-123",
+    "resources": {
+      "compute_instances": [
+        {
+          "id": "1234567890123456789",
+          "name": "web-server-1",
+          "machine_type": "e2-standard-2",
+          "status": "RUNNING",
+          "zone": "us-central1-a",
+          "region": "us-central1",
+          "creation_timestamp": "2024-01-01T00:00:00Z",
+          "tags": ["web-server", "production"],
+          "network_interfaces": [
+            {
+              "name": "nic0",
+              "network": "projects/my-gcp-project-123/global/networks/default",
+              "subnetwork": "projects/my-gcp-project-123/regions/us-central1/subnetworks/default",
+              "internal_ip": "10.128.0.2",
+              "external_ip": "34.123.45.67"
+            }
+          ],
+          "disks": [
+            {
+              "name": "web-server-1-disk",
+              "size_gb": 100,
+              "type": "pd-standard"
+            }
+          ]
+        },
+        {
+          "id": "9876543210987654321",
+          "name": "database-server",
+          "machine_type": "e2-standard-4",
+          "status": "RUNNING",
+          "zone": "us-central1-b",
+          "region": "us-central1",
+          "creation_timestamp": "2024-01-05T00:00:00Z",
+          "tags": ["database", "production"],
+          "network_interfaces": [
+            {
+              "name": "nic0",
+              "network": "projects/my-gcp-project-123/global/networks/default",
+              "subnetwork": "projects/my-gcp-project-123/regions/us-central1/subnetworks/default",
+              "internal_ip": "10.128.0.3",
+              "external_ip": null
+            }
+          ],
+          "disks": [
+            {
+              "name": "database-server-disk",
+              "size_gb": 500,
+              "type": "pd-ssd"
+            }
+          ]
+        }
+      ],
+      "cloud_sql_instances": [
+        {
+          "id": "mysql-instance-1",
+          "name": "projects/my-gcp-project-123/instances/mysql-instance-1",
+          "database_version": "MYSQL_8_0",
+          "region": "us-central1",
+          "state": "RUNNABLE",
+          "instance_type": "CLOUD_SQL_INSTANCE",
+          "tier": "db-n1-standard-1",
+          "storage_type": "SSD",
+          "storage_size_gb": 100,
+          "backup_enabled": true,
+          "ip_addresses": [
+            {
+              "type": "PRIMARY",
+              "ip_address": "10.128.0.4"
+            }
+          ],
+          "authorized_networks": []
+        }
+      ],
+      "storage_buckets": [
+        {
+          "name": "my-app-backups-gcp",
+          "location": "US",
+          "storage_class": "STANDARD",
+          "created": "2024-01-01T00:00:00Z",
+          "updated": "2024-01-15T10:00:00Z",
+          "public_access": false,
+          "versioning_enabled": false,
+          "lifecycle_rules": 0
+        },
+        {
+          "name": "my-public-assets-gcp",
+          "location": "US",
+          "storage_class": "STANDARD",
+          "created": "2024-01-02T00:00:00Z",
+          "updated": "2024-01-15T10:00:00Z",
+          "public_access": true,
+          "versioning_enabled": true,
+          "lifecycle_rules": 2
+        }
+      ],
+      "iam_policies": [
+        {
+          "project_id": "my-gcp-project-123",
+          "note": "Full IAM scanning requires additional permissions and API setup"
+        }
+      ],
+      "networking": {
+        "networks": [
+          {
+            "name": "default",
+            "id": "1234567890123456789",
+            "description": "Default network for the project",
+            "auto_create_subnetworks": true,
+            "creation_timestamp": "2024-01-01T00:00:00Z",
+            "subnetworks": [
+              "projects/my-gcp-project-123/regions/us-central1/subnetworks/default"
+            ]
+          }
+        ],
+        "total_networks": 1
+      }
+    },
+    "summary": {
+      "total_compute_instances": 2,
+      "total_sql_instances": 1,
+      "total_storage_buckets": 2,
+      "total_networks": 1
+    }
+  }
+}
