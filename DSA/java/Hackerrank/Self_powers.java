@@ -1,0 +1,27 @@
+/*
+The series, 11 + 22 + 33 + ... + 1010 = 10405071317.
+Find the last ten digits of the series, 11 + 22 + 33 + ... + 10001000
+Answer : 9110846700
+ */
+
+package Hackerrank;
+
+import java.math.BigInteger;
+import java.util.Scanner;
+
+public class Self_powers {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        long t = in.nextLong();
+        System.out.println(count(t));
+    }
+
+
+    public static String count(long num) {
+        BigInteger modulus = BigInteger.TEN.pow(10);
+        BigInteger sum = BigInteger.ZERO;
+        for (int i = 1; i <= num; i++)
+            sum = sum.add(BigInteger.valueOf(i).modPow(BigInteger.valueOf(i), modulus));
+        return sum.mod(modulus).toString();
+    }
+}
